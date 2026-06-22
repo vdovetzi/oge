@@ -1,0 +1,27 @@
+name: Bug report
+description: Report a reproducible problem
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: textarea
+    attributes:
+      label: Description
+      description: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Reproduction steps
+      placeholder: "1. Open ...\n2. Select ...\n3. Observe ..."
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Environment
+      description: OS, Python version, and Tk version
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Logs, screenshots, and a minimal map when possible

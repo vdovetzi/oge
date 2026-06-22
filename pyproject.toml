@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "occupancy-grid-editor"
+dynamic = ["version"]
+description = "A lightweight standalone editor for map_saver occupancy grids"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+authors = [{name = "Ilya Vdovets"}]
+keywords = ["occupancy-grid", "robotics", "mapping", "pgm", "tkinter"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: X11 Applications",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "build>=1.2,<2",
+    "coverage[toml]>=7.6,<8",
+    "ruff>=0.11,<1",
+]
+
+[project.gui-scripts]
+occupancy-grid-editor = "oge.ui:main"
+
+[project.urls]
+Homepage = "https://github.com/vdovetzi/oge"
+Issues = "https://github.com/vdovetzi/oge/issues"
+Repository = "https://github.com/vdovetzi/oge"
+
+[tool.setuptools.packages.find]
+include = ["oge*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "oge.__version__"}
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.coverage.run]
+branch = true
+source = ["oge"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.coverage.xml]
+output = "coverage.xml"
