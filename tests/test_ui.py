@@ -1,5 +1,4 @@
 import tempfile
-import tkinter as tk
 import unittest
 from pathlib import Path
 
