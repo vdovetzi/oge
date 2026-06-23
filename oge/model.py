@@ -7,6 +7,77 @@ from pathlib import Path
 from .paths import resolve_within
 
 
+class _PgmReader:
+    def __init__(self, data):
+        self.data = data
+        self.index = 0
+
+    def read(self):
+        magic, width, height, maximum = self.read_header()
+        self.validate_header(magic, width, height, maximum)
+        if magic == b"P5":
+            pixels = self.read_binary_pixels(width, height)
+        else:
+            pixels = self.read_ascii_pixels(width, height)
+        if len(pixels) != width * height:
+            raise ValueError("PGM image is incomplete")
+        return width, height, pixels
+
+    def read_header(self):
+        try:
+            return self.token(), int(self.token()), int(self.token()), int(self.token())
+        except ValueError as error:
+            raise ValueError("Invalid PGM header") from error
+
+    @staticmethod
+    def validate_header(magic, width, height, maximum):
+        if magic not in (b"P5", b"P2") or maximum != 255:
+            raise ValueError("Only 8-bit PGM maps are supported")
+        if width <= 0 or height <= 0:
+            raise ValueError("PGM dimensions must be greater than zero")
+
+    def read_binary_pixels(self, width, height):
+        self.consume_raster_separator()
+        return self.data[self.index:self.index + width * height]
+
+    def read_ascii_pixels(self, width, height):
+        try:
+            values = [int(self.token()) for _ in range(width * height)]
+        except ValueError as error:
+            raise ValueError("Invalid PGM pixel data") from error
+        if any(value < 0 or value > 255 for value in values):
+            raise ValueError("PGM pixel value is outside 0..255")
+        return bytes(values)
+
+    def token(self):
+        self.skip_whitespace_and_comments()
+        start = self.index
+        while self.index < len(self.data) and not self.data[self.index:self.index + 1].isspace():
+            self.index += 1
+        return self.data[start:self.index]
+
+    def skip_whitespace_and_comments(self):
+        while self.index < len(self.data):
+            current = self.data[self.index:self.index + 1]
+            if current == b"#":
+                self.skip_comment()
+            elif current.isspace():
+                self.index += 1
+            else:
+                return
+
+    def skip_comment(self):
+        newline = self.data.find(b"\n", self.index)
+        if newline < 0:
+            raise ValueError("Invalid PGM comment")
+        self.index = newline + 1
+
+    def consume_raster_separator(self):
+        if self.index >= len(self.data) or not self.data[self.index:self.index + 1].isspace():
+            raise ValueError("Invalid PGM header")
+        self.index += 2 if self.data[self.index:self.index + 2] == b"\r\n" else 1
+
+
 @dataclass
 class Metadata:
     resolution: float = 0.05
@@ -66,50 +137,7 @@ class OccupancyMap:
 
     @staticmethod
     def read_pgm(path):
-        data = Path(path).read_bytes()
-        index = 0
-
-        def token():
-            nonlocal index
-            while index < len(data):
-                if data[index:index + 1] == b"#":
-                    newline = data.find(b"\n", index)
-                    if newline < 0:
-                        raise ValueError("Invalid PGM comment")
-                    index = newline + 1
-                elif data[index:index + 1].isspace():
-                    index += 1
-                else:
-                    break
-            start = index
-            while index < len(data) and not data[index:index + 1].isspace():
-                index += 1
-            return data[start:index]
-
-        try:
-            magic, width, height, maximum = token(), int(token()), int(token()), int(token())
-        except ValueError as error:
-            raise ValueError("Invalid PGM header") from error
-        if magic not in (b"P5", b"P2") or maximum != 255:
-            raise ValueError("Only 8-bit PGM maps are supported")
-        if width <= 0 or height <= 0:
-            raise ValueError("PGM dimensions must be greater than zero")
-        if magic == b"P5":
-            if index >= len(data) or not data[index:index + 1].isspace():
-                raise ValueError("Invalid PGM header")
-            index += 2 if data[index:index + 2] == b"\r\n" else 1
-            pixels = data[index:index + width * height]
-        else:
-            try:
-                values = [int(token()) for _ in range(width * height)]
-            except ValueError as error:
-                raise ValueError("Invalid PGM pixel data") from error
-            if any(value < 0 or value > 255 for value in values):
-                raise ValueError("PGM pixel value is outside 0..255")
-            pixels = bytes(values)
-        if len(pixels) != width * height:
-            raise ValueError("PGM image is incomplete")
-        return width, height, pixels
+        return _PgmReader(Path(path).read_bytes()).read()
 
     def pgm_bytes(self):
         return f"P5\n{self.width} {self.height}\n255\n".encode() + bytes(self.pixels)
