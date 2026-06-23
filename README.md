@@ -1,7 +1,7 @@
 # Occupancy Grid Editor
 
 [![CI](https://github.com/vdovetzi/oge/actions/workflows/ci.yml/badge.svg)](https://github.com/vdovetzi/oge/actions/workflows/ci.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=vdovetzi_oge&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=vdovetzi_oge)
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=vdovetzi_oge&token=c9bfdb65c114ef3cdbc45ceb13a34aaebd1add0c)](https://sonarcloud.io/summary/new_code?id=vdovetzi_oge)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A small standalone desktop editor for occupancy-grid maps stored in the common
