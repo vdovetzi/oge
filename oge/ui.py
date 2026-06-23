@@ -1,4 +1,3 @@
-import sys
 import tkinter as tk
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
@@ -130,13 +129,3 @@ class OccupancyEditor(tk.Tk):
     def close(self):
         if self.confirm_discard():
             self.destroy()
-
-
-def main(arguments=None):
-    app = OccupancyEditor()
-    arguments = sys.argv[1:] if arguments is None else arguments
-    if arguments and not app.open_path(arguments[0]):
-        app.destroy()
-        return 1
-    app.mainloop()
-    return 0

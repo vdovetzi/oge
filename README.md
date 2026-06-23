@@ -60,6 +60,12 @@ Open a map immediately by passing its YAML file:
 occupancy-grid-editor path/to/map.yaml
 ```
 
+For CLI safety, the map path must resolve inside the directory where the
+command was invoked, and the referenced PGM must remain inside the YAML file's
+directory. Change into the map's parent directory before opening a map stored
+elsewhere. Files selected explicitly through the desktop file dialog are not
+restricted to the invocation directory.
+
 ## Controls
 
 | Action | Mouse / keyboard |

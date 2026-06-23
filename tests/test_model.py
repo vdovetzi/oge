@@ -47,6 +47,17 @@ class OccupancyMapTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "incomplete"):
                 OccupancyMap.read_pgm(path)
 
+    def test_yaml_cannot_reference_image_outside_map_directory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            maps = root / "maps"
+            maps.mkdir()
+            (root / "outside.pgm").write_bytes(b"P5\n1 1\n255\n\x00")
+            yaml_path = maps / "map.yaml"
+            yaml_path.write_text("image: ../outside.pgm\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "Access denied"):
+                OccupancyMap.load(yaml_path)
+
 
 if __name__ == "__main__":
     unittest.main()

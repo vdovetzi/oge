@@ -4,6 +4,8 @@ import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
+from .paths import resolve_within
+
 
 @dataclass
 class Metadata:
@@ -36,7 +38,7 @@ class OccupancyMap:
 
     @classmethod
     def load(cls, yaml_path):
-        path = Path(yaml_path)
+        path = Path(yaml_path).resolve(strict=True)
         values = {}
         for source in path.read_text(encoding="utf-8").splitlines():
             line = source.strip()
@@ -58,8 +60,7 @@ class OccupancyMap:
         )
         metadata.validate()
         image_path = Path(values["image"].strip("\"'"))
-        if not image_path.is_absolute():
-            image_path = path.parent / image_path
+        image_path = resolve_within(path.parent, image_path)
         width, height, pixels = cls.read_pgm(image_path)
         return cls(width, height, pixels, metadata, path.resolve())
 

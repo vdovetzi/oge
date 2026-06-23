@@ -29,7 +29,7 @@ dev = [
 ]
 
 [project.gui-scripts]
-occupancy-grid-editor = "oge.ui:main"
+occupancy-grid-editor = "oge.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/vdovetzi/oge"
