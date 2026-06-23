@@ -39,8 +39,6 @@ jobs:
             echo "SONAR_TOKEN is present"
           fi
       - name: Scan
-        uses: SonarSource/sonarqube-scan-action@v5
-        with:
-          args: -Dsonar.qualitygate.wait=true
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
